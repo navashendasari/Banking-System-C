@@ -50,14 +50,63 @@ void display_all_accounts(){
 
 int main(){
     
-    struct Account *user1 = create_account(5564075, 660000, "Winston");
-    add_Account(user1);
-    struct Account *user2 = create_account(5564175, 550000, "Franklin");
-    add_Account(user2);
-    struct Account *user3 = create_account(5564275, 710000, "Stanlin");
-    add_Account(user3);
+    int session = 1;
+    int choice;
 
-    display_all_accounts();
+    while(session){
+        printf("=================================== \n");
+        printf("🅣🅔🅡🅜🅘🅝🅐🅛 🅑🅐🅚🅘🅝🅖 🅢🅨🅢🅣🅔🅜🅢 \n");
+        printf("=================================== \n");
+        printf("[1] Open New Account\n");
+        printf("[2] View All Active Accounts\n");
+        printf("[0] Terminate Session\n");
+
+        printf("Enter Command: ");
+
+        scanf("%d", &choice);
+        switch(choice){
+            case 1:{
+                int id;
+                float balance;
+                char name[50];
+
+                printf("Enter your Full Name: ");
+                scanf(" %[^\n]", name);
+
+                printf("Create your Bank ID: ");
+                scanf("%d", &id);
+
+                printf("Enter the initial deposit amount: ");
+                scanf("%f", &balance);
+                
+                struct Account *new_user = create_account(id, balance, name);
+                
+                if (new_user != NULL) {
+                    add_Account(new_user);
+                    printf(">> SYSTEM: Account successfully registered to %s.\n", name);
+                
+                }
+                break;
+            }
+            case 2:{
+                printf("System Database: \n");
+                display_all_accounts();
+                break;
+            }
+
+            case 0:{
+                printf("\n>> SYSTEM: Saving states... Terminating process.\n");
+                session = 0;
+                printf("Session Terminated.");
+                break;
+            }
+            
+            default:{
+                printf("Invalid Command Entered. \n");
+                break;
+            }
+        }
+    }
     
     return 0;
 }
