@@ -42,10 +42,25 @@ void add_Account(struct Account *new_account){
 
 void display_all_accounts(){
     struct Account *current = head;
+     if(current == NULL){
+        printf("Currently no active accounts.\n");
+        return;
+    }
     while(current != NULL){
         printf("Name: %s, Account ID: %d, Balance: %.2f \n",current->name , current->account_id, current->balance);
         current = current->next;
     }
+}
+
+struct Account *find_account(int target_id){
+    struct Account *current = head;
+    while (current != NULL){
+        if(current->account_id == target_id){
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
 }
 
 int main(){
@@ -63,9 +78,14 @@ int main(){
 
         printf("Enter Command: ");
 
-        scanf("%d", &choice);
+        if (scanf("%d", &choice) != 1) {
+            while (getchar() != '\n');
+            choice = -1; 
+        }
+
         switch(choice){
             case 1:{
+
                 int id;
                 float balance;
                 char name[50];
@@ -75,6 +95,10 @@ int main(){
 
                 printf("Create your Bank ID: ");
                 scanf("%d", &id);
+                if (find_account(id) != NULL){
+                    printf("Bank ID Already exisits!, Please try a new one. \n");
+                    continue;
+                }
 
                 printf("Enter the initial deposit amount: ");
                 scanf("%f", &balance);
