@@ -65,7 +65,7 @@ struct Account *find_account(int target_id){
     return NULL;
 }
 
-    int auth_session(struct Account *current_user){
+int auth_session(struct Account *current_user){
     int client_active = 1;
     int choice;
 
@@ -89,17 +89,34 @@ struct Account *find_account(int target_id){
 
         switch(choice) {
             case 1:
-                // TODO: Ask for amount, add to current_user->balance
+                float deposit;
+                printf("Enter deposit amount: ");
+                scanf("%f", &deposit);
+
+                current_user->balance += deposit;
+
+                printf("\nDeposit of %.2f was successful. Current Balance: %.2f", deposit, current_user->balance);
+
                 break;
             case 2:
-                // TODO: Ask for amount, subtract from current_user->balance
+                float withdrawal;
+                printf("Enter withdrawal amount: ");
+                scanf("%f", &withdrawal);
+
+                if(current_user->balance >= withdrawal){
+                    current_user->balance -= withdrawal;
+                    printf("\nWithdrawal of %.2f was successful. Current Balance: %.2f", withdrawal, current_user->balance);
+                }else{
+                    printf("Insufficient Funds, try again.");
+                    continue;
+                }
                 break;
             case 3:
                 // TODO: Call close_account(), then return 2;
                 break;
             case 0:
                 printf("Logging out...\n");
-                return 0; // This cleanly exits the function and passes 0 back to main()
+                return 0;
             default:
                 printf("Invalid command.\n");
         }
