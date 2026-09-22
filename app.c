@@ -49,7 +49,7 @@ void display_all_accounts(){
         return;
     }
     while(current != NULL){
-        printf("Name: %s, Account ID: %d, Balance: %.2f, password: %s \n",current->name , current->account_id, current->balance, current->password);
+        printf("Name: %s, Account ID: %d \n",current->name , current->account_id);
         current = current->next;
     }
 }
@@ -63,6 +63,52 @@ struct Account *find_account(int target_id){
         current = current->next;
     }
     return NULL;
+}
+
+int close_account(int del_id){
+    if(head == NULL){
+        return -1;
+    }
+    int del_choice;
+    printf("Are you sure you want to delete your Account? [ID: %d] \n[1] Yes.\n[2] No.", del_id);
+    if (scanf("%d", &del_choice) != 1){
+        while(getchar() != '\n');
+        del_choice = -1;
+    }
+
+    switch(del_choice){
+        case 1:{
+
+            struct Account *del_user = find_account(del_id);
+            if(head->account_id == del_id){
+                head = head->next;
+                free(del_user);
+                return 1;
+            }
+            else {
+                struct Account *current = head;
+
+                while (current->next != NULL) {
+                    if (current->next->account_id == del_id) {
+                    current->next = del_user->next; 
+                    break;
+                }
+                    current = current->next;
+                }
+    
+                free(del_user);
+                return 1;
+            }
+        }
+        case 2:{
+            printf("Account deletion cancelled.\n");
+            return 0;
+        }
+        default:{
+            printf("Invalid Selection, Please try again.\n");
+            return 0;
+        }
+    }
 }
 
 int auth_session(struct Account *current_user){
@@ -79,6 +125,7 @@ int auth_session(struct Account *current_user){
         printf("[1] Deposit\n");
         printf("[2] Withdraw\n");
         printf("[3] Delete Account\n");
+        printf("[4] Fund Transfer (interal)\n");
         printf("[0] Logout\n");
         printf("Enter Command: ");
 
@@ -88,37 +135,118 @@ int auth_session(struct Account *current_user){
         }
 
         switch(choice) {
-            case 1:
+            case 1:{
                 float deposit;
                 printf("Enter deposit amount: ");
-                scanf("%f", &deposit);
 
+                if (scanf("%f", &deposit) != 1) {
+                    printf("Invalid deposit amount.\n");
+                    while (getchar() != '\n');
+                    break;
+                }
+                if (deposit <= 0) {
+                    printf("Deposit amount must be greater than zero.\n");
+                    continue;
+                }
                 current_user->balance += deposit;
 
                 printf("\nDeposit of %.2f was successful. Current Balance: %.2f", deposit, current_user->balance);
 
                 break;
-            case 2:
+            }
+            case 2:{
                 float withdrawal;
                 printf("Enter withdrawal amount: ");
-                scanf("%f", &withdrawal);
+                
+                if (scanf("%f", &withdrawal) != 1) {
+                    printf("Invalid withdrawal amount.\n");
+                    while (getchar() != '\n');
+                    break;
+                }
+                if (withdrawal <= 0) {
+                    printf("Withdraw amount must be greater than zero.\n");
+                    continue;
+                }
 
                 if(current_user->balance >= withdrawal){
                     current_user->balance -= withdrawal;
                     printf("\nWithdrawal of %.2f was successful. Current Balance: %.2f", withdrawal, current_user->balance);
                 }else{
-                    printf("Insufficient Funds, try again.");
+                    printf("Insufficient Funds, try again.\n");
                     continue;
                 }
                 break;
-            case 3:
-                // TODO: Call close_account(), then return 2;
+            }
+            case 3:{
+                int del = close_account(current_user->account_id);
+                if(del == 1){
+                   printf("...Intiating New Session....\n");
+                   return 2;
+                }
                 break;
-            case 0:
+            }
+            case 4: {
+                float amount;
+                int recipient_id;
+                char transaction_auth_pwd[50];
+
+                printf("\nEnter the recipient's Bank ID: ");
+
+                if(scanf("%d", &recipient_id) != 1) {
+                    while(getchar() != '\n');
+                    printf("Invalid input. Please enter a number.\n");
+                    continue;
+                }
+                
+                if (recipient_id == current_user->account_id) {
+                    printf("You cannot transfer funds to your own account.\n");
+                    continue;
+                }
+
+                struct Account *recipient = find_account(recipient_id);
+
+                if(recipient == NULL) {
+                    printf("Bank ID not found, Try again with an existing Bank ID.\n");
+                    continue;
+                }
+
+                printf("Enter transfer amount: ");
+                if(scanf("%f", &amount) != 1) {
+                    while(getchar() != '\n');
+                    printf("Invalid input. Please enter a number.\n");
+                    continue;
+                }
+                
+                if (amount <= 0) {
+                    printf("Invalid amount. Transfer amount cannot be zero or negative.\n");
+                    continue;
+                }
+
+                if (current_user->balance < amount) {
+                    printf("Insufficient Funds for this transfer.\n");
+                    continue;
+                }
+
+                printf("Enter password to confirm transfer: ");
+                scanf("%49s", transaction_auth_pwd);
+
+                if(strcmp(transaction_auth_pwd, current_user->password) == 0) {
+                    current_user->balance -= amount;
+                    recipient->balance += amount;
+                    printf("Transfer of $%.2f to %s was successful.\n", amount, recipient->name);
+                } else {
+                    printf("Wrong Password. Transfer cancelled.\n");
+                }
+                
+                continue;
+            }
+            case 0:{
                 printf("Logging out...\n");
                 return 0;
-            default:
+            }
+            default:{
                 printf("Invalid command.\n");
+            }
         }
     }
     return 1; 
@@ -154,7 +282,7 @@ int main(){
                 char name[50];
 
                 printf("Enter your Full Name: ");
-                scanf(" %[^\n]", name);
+                scanf(" %49[^\n]", name);
 
                 printf("Create your Bank ID: ");
                 
@@ -166,22 +294,25 @@ int main(){
 
 
                 if (find_account(id) != NULL){
-                    printf("Bank ID Already exisits!, Please try a new one. \n");
+                    printf("Bank ID Already exists!, Please try a new one. \n");
                     continue;
                 }
 
                 printf("Enter a strong password: ");
-                scanf(" %[^\n]", password);
+                scanf("%49s", password);
 
 
                 printf("Enter the initial deposit amount: ");
                 
                 if (scanf("%f", &balance) != 1) {
                     while (getchar() != '\n');
-                    printf("Invalid Deposit, Enter a numeric value. \n");
+                    printf("Invalid input. Please enter a number.\n");
                     continue;
                 }
-// Automate this user input checking thingy to a seperate function();
+                if (balance < 100.00) {
+                    printf("Initial deposit must be at least $100.00.\n");
+                    continue;
+                }
 
                 struct Account *new_user = create_account(id, balance, name, password);
                 
@@ -207,7 +338,7 @@ int main(){
                 printf("Enter your Bank ID: ");
                 if (scanf("%d", &auth_id) != 1) {
                     while (getchar() != '\n');
-                    printf("Invalid Bank ID, Enter a numeric value.");
+                    printf("Invalid Bank ID, Enter a numeric value. \n");
                     continue;
                 }
 
@@ -218,7 +349,7 @@ int main(){
                     break; 
                 }
                 printf("Enter Password: ");
-                scanf("%s", auth_pwd);
+                scanf("%49s", auth_pwd);
                 if (strcmp(user->password, auth_pwd) != 0) {
                     printf(">> SECRUITY ALERT: Invalid password.\n");
                     break;

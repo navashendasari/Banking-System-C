@@ -8,7 +8,7 @@ The development follows a modular approach, scaling from basic state management 
 
 | Version | Phase | Primary Features | Ticket Range |
 | :---- | :---- | :---- | :---- |
-| v1.0 | State Management | Structs, Linked Lists, Menu Enums | BNK-100 to BNK-105 |
+| v1.0 | State Management | Structs, Linked Lists, Menu Enums | BNK-100 to BNK-106 |
 | v2.0 | Modular Logic | Makefiles, Header Refactoring, Error Codes | BNK-200 to BNK-210 |
 | v3.0 | Hash Tables | O(1) Account Lookup, Collision Handling | BNK-300 to BNK-315 |
 | v4.0 | Persistence | File I/O (Binary), Serialization | BNK-400 to BNK-408 |
