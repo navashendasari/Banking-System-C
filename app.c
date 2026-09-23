@@ -125,7 +125,7 @@ int auth_session(struct Account *current_user){
         printf("[1] Deposit\n");
         printf("[2] Withdraw\n");
         printf("[3] Delete Account\n");
-        printf("[4] Fund Transfer (interal)\n");
+        printf("[4] Fund Transfer (internal)\n");
         printf("[0] Logout\n");
         printf("Enter Command: ");
 
@@ -180,7 +180,7 @@ int auth_session(struct Account *current_user){
             case 3:{
                 int del = close_account(current_user->account_id);
                 if(del == 1){
-                   printf("...Intiating New Session....\n");
+                   printf("...Initiating New Session....\n");
                    return 2;
                 }
                 break;
@@ -351,7 +351,7 @@ int main(){
                 printf("Enter Password: ");
                 scanf("%49s", auth_pwd);
                 if (strcmp(user->password, auth_pwd) != 0) {
-                    printf(">> SECRUITY ALERT: Invalid password.\n");
+                    printf(">> SECURITY ALERT: Invalid password.\n");
                     break;
                 }
 
