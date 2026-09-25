@@ -89,4 +89,6 @@ If you are using the provided build system, simply run:
 
 Once compiled, start the system with:
 
+FOR V2: Use : gcc app.c database.c auth.c -o bank
+
 `./banking_system`  
